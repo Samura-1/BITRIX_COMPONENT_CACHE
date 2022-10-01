@@ -3,11 +3,26 @@ if (!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED !== true) {
     die();
 }
 use Bitrix\Iblock,
-    Bitrix\Main\Loader;
+    Bitrix\Main\Loader,
+    Bitrix\Main\Application;
 class Salons extends CBitrixComponent
 {
-    public $filter;
-    public function onPrepareComponentParams($params)
+    private $filter;
+    private $_request;
+    private function _checkModules()
+    {
+        if (!Loader::includeModule("iblock")) {
+            $this->abortResultCache();
+            ShowError(GetMessage("IBLOCK_MODULE_NOT_INSTALLED"));
+            return;
+        }
+    }
+    private function _app()
+    {
+        global $APPLICATION;
+        return $APPLICATION;
+    }
+    public function onPrepareComponentParams($params): array
     {
         if (empty($params['COUNT'])) {
             $params['COUNT'] = 2;
@@ -19,7 +34,7 @@ class Salons extends CBitrixComponent
     }
     private function getButtonAdd()
     {
-        global $APPLICATION;
+        $this->_app();
             if (Loader::includeModule("iblock")) {
                 $arButtons = CIBlock::GetPanelButtons(
                     $this->arParams["IBLOCK_ID"],
@@ -28,12 +43,12 @@ class Salons extends CBitrixComponent
                     ["SECTION_BUTTONS"=>false],
             );
 
-            if($APPLICATION->GetShowIncludeAreas()){
-                $this->AddIncludeAreaIcons(CIBlock::GetComponentMenu($APPLICATION->GetPublicShowMode(), $arButtons));
+            if($this->_app()->GetShowIncludeAreas()){
+                $this->AddIncludeAreaIcons(CIBlock::GetComponentMenu($this->_app()->GetPublicShowMode(), $arButtons));
             }
         }
     }
-    public function getSalons()
+    public function getSalons(): array
     {
         $arSelect = [
             "ID",
@@ -53,7 +68,7 @@ class Salons extends CBitrixComponent
         }
 
         $arResult["ITEMS"] = [];
-        $img_item["PREVIEW_PICTURE_ID"] = [];
+        $arrayImgItem["PREVIEW_PICTURE_ID"] = [];
 
         $res = CIBlockElement::GetList([], $arFilter, false, ["nTopCount" => $this->arParams["COUNT"]], $arSelect);
 
@@ -64,26 +79,27 @@ class Salons extends CBitrixComponent
                 0,
                 ["SECTION_BUTTONS" => false, "SESSID" => false]
             );
+
             $row["EDIT_LINK"] = $arButtons["edit"]["edit_element"]["ACTION_URL"];
             $row["DELETE_LINK"] = $arButtons["edit"]["delete_element"]["ACTION_URL"];
 
             $arResult["ITEMS"][$row["ID"]] = $row;
 
             if ($row['PREVIEW_PICTURE']) {
-                $img_item['PREVIEW_PICTURE_ID'][$row["ID"]] = (int)$arResult['ITEMS'][$row["ID"]]['PREVIEW_PICTURE'];
+                $arrayImgItem['PREVIEW_PICTURE_ID'][$row["ID"]] = (int)$arResult['ITEMS'][$row["ID"]]['PREVIEW_PICTURE'];
             }
         }
         unset($row);
 
-        if (!empty($img_item['PREVIEW_PICTURE_ID'])) {
-            $dbfiles = CFile::GetList(false, ["@ID" => $img_item['PREVIEW_PICTURE_ID']]);
-
-            while ($image = $dbfiles->GetNext()) {
-                $imges[$image['ID']]['SRC'] = CFile::GetFileSRC($image);
+        if (!empty($arrayImgItem['PREVIEW_PICTURE_ID'])) {
+            $arrayImg = [];
+            $dbFiles = CFile::GetList(false, ["@ID" => $arrayImgItem['PREVIEW_PICTURE_ID']]);
+            while ($image = $dbFiles->GetNext()) {
+                $arrayImg[$image['ID']]['SRC'] = CFile::GetFileSRC($image);
             }
-            foreach ($arResult['ITEMS'] as $key => &$item) {
-                if (isset($img_item, $item['PREVIEW_PICTURE'])) {
-                    $item['PREVIEW_PICTURE'] = $imges[$item['PREVIEW_PICTURE']];
+            foreach ($arResult['ITEMS'] as $key => $item) {
+                if (isset($arrayImgItem, $item['PREVIEW_PICTURE'])) {
+                    $arResult['ITEMS'][$key]['PREVIEW_PICTURE'] = $arrayImg[$item['PREVIEW_PICTURE']];
                 }
             }
         }
@@ -92,16 +108,11 @@ class Salons extends CBitrixComponent
 
     public function executeComponent()
     {
-        if ($this->startResultCache(false, $_GET['id'])) {
-            if (!Loader::includeModule("iblock")) {
-                $this->abortResultCache();
-                ShowError(GetMessage("IBLOCK_MODULE_NOT_INSTALLED"));
-                return;
-            }
-            switch ($_GET['id'])
+        $this->_request = Application::getInstance()->getContext()->getRequest();
+        if ($this->startResultCache(false, $this->_request->get('id'))) {
+            $this->_checkModules();
+            switch ($this->_request->get('id'))
             {
-                default:
-                    break;
                 case 'edible' :
                     $this->filter = ['!PROPERTY_EDIBLE' => false];
                     break;
@@ -110,7 +121,7 @@ class Salons extends CBitrixComponent
                     break;
             }
             $this->arResult = $this->getSalons();
-            $this->setResultCacheKeys($this->arResult);
+            $this->setResultCacheKeys([]);
             $this->includeComponentTemplate();
         }
         $this->getButtonAdd();

@@ -9,23 +9,4 @@ $APPLICATION->SetTitle("Рога и Сила");
 		</div>
 	</div>
 </div>
- </section> <section class="news-block-inverse px-6 py-4"> </section> <?$APPLICATION->IncludeComponent(
-	"stores.list", 
-	"inner_items_template",
-	array(
-		"COMPONENT_TEMPLATE" => "inner_items_template",
-		"IBLOCK_TYPE" => "Salons",
-		"IBLOCK_ID" => "4",
-		"DISPLAY_MAP" => "N",
-		"NEWS_COUNT" => "3",
-		"URL_ALL" => "",
-		"SORT_BY1" => "DATE_CREATE",
-		"SORT_ORDER1" => "DESC",
-		"CACHE_TYPE" => "A",
-		"CACHE_TIME" => "3600",
-		"SET_STATUS_404" => "N",
-		"SHOW_404" => "N",
-		"MESSAGE_404" => ""
-	),
-	false
-);?><br><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+ </section> <section class="news-block-inverse px-6 py-4"> </section> <br><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
