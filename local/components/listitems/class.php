@@ -8,7 +8,7 @@ use Bitrix\Iblock,
 class Salons extends CBitrixComponent
 {
     private $filter;
-    private $_request;
+    protected $request;
     private function _checkModules()
     {
         if (!Loader::includeModule("iblock")) {
@@ -108,10 +108,10 @@ class Salons extends CBitrixComponent
 
     public function executeComponent()
     {
-        $this->_request = Application::getInstance()->getContext()->getRequest();
-        if ($this->startResultCache(false, $this->_request->get('id'))) {
+        $this->request = Application::getInstance()->getContext()->getRequest();
+        if ($this->startResultCache(false, $this->request->get('id'))) {
             $this->_checkModules();
-            switch ($this->_request->get('id'))
+            switch ($this->request->get('id'))
             {
                 case 'edible' :
                     $this->filter = ['!PROPERTY_EDIBLE' => false];
