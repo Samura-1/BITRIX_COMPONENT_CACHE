@@ -11,6 +11,9 @@
 /** @var string $componentPath */
 /** @var CBitrixComponent $component */
 $this->setFrameMode(true);
+// echo "<pre>";
+// var_dump($arResult);
+// echo "</pre>";
 ?>
 <div class="link">
     <div class="container">
@@ -38,3 +41,4 @@ $this->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayB
 </div>
 <?endforeach;?>
 </div>
+<?"<br>"?><?=$arResult['NAV_STRING'];  ?>

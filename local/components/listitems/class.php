@@ -17,7 +17,7 @@ class Salons extends CBitrixComponent
             return;
         }
     }
-    private function _app()
+    private function app()
     {
         global $APPLICATION;
         return $APPLICATION;
@@ -34,7 +34,7 @@ class Salons extends CBitrixComponent
     }
     private function getButtonAdd()
     {
-        $this->_app();
+        $this->app();
             if (Loader::includeModule("iblock")) {
                 $arButtons = CIBlock::GetPanelButtons(
                     $this->arParams["IBLOCK_ID"],
@@ -43,8 +43,8 @@ class Salons extends CBitrixComponent
                     ["SECTION_BUTTONS"=>false],
             );
 
-            if($this->_app()->GetShowIncludeAreas()){
-                $this->AddIncludeAreaIcons(CIBlock::GetComponentMenu($this->_app()->GetPublicShowMode(), $arButtons));
+            if ($this->app()->GetShowIncludeAreas()) {
+                $this->AddIncludeAreaIcons(CIBlock::GetComponentMenu($this->app()->GetPublicShowMode(), $arButtons));
             }
         }
     }
@@ -70,7 +70,7 @@ class Salons extends CBitrixComponent
         $arResult["ITEMS"] = [];
         $arrayImgItem["PREVIEW_PICTURE_ID"] = [];
 
-        $res = CIBlockElement::GetList([], $arFilter, false, ["nTopCount" => $this->arParams["COUNT"]], $arSelect);
+        $res = CIBlockElement::GetList([], $arFilter, false, ["nPageSize" => $this->arParams['COUNT'], "bShowAll" => false], $arSelect);
 
         while ($row = $res->GetNext(true, false)) {
             $arButtons = CIBlock::GetPanelButtons(
@@ -88,6 +88,7 @@ class Salons extends CBitrixComponent
             if ($row['PREVIEW_PICTURE']) {
                 $arrayImgItem['PREVIEW_PICTURE_ID'][$row["ID"]] = (int)$arResult['ITEMS'][$row["ID"]]['PREVIEW_PICTURE'];
             }
+            $arResult["NAV_STRING"] = $res->GetPageNavStringEx($navComponentObject, "", 'modern');
         }
         unset($row);
 
@@ -103,14 +104,16 @@ class Salons extends CBitrixComponent
                 }
             }
         }
+
         return $arResult;
     }
 
     public function executeComponent()
     {
         $this->request = Application::getInstance()->getContext()->getRequest();
-        if ($this->startResultCache(false, $this->request->get('id'))) {
+        if ($this->startResultCache(false,[[$this->request->get('id') === 'edible'],[$this->request->get('id') === 'edibleno'],[$this->request->get('PAGEN_1')]])) {
             $this->_checkModules();
+
             switch ($this->request->get('id'))
             {
                 case 'edible' :
@@ -120,6 +123,7 @@ class Salons extends CBitrixComponent
                     $this->filter = ['PROPERTY_EDIBLE' => false];
                     break;
             }
+            
             $this->arResult = $this->getSalons();
             $this->setResultCacheKeys([]);
             $this->includeComponentTemplate();
