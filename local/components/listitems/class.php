@@ -111,7 +111,7 @@ class Salons extends CBitrixComponent
     public function executeComponent()
     {
         $this->request = Application::getInstance()->getContext()->getRequest();
-        if ($this->startResultCache(false,[[$this->request->get('id') === 'edible'],[$this->request->get('id') === 'edibleno'],[$this->request->get('PAGEN_1')]])) {
+        if ($this->startResultCache(false, [[$this->request->get('id') === 'edible'], [$this->request->get('id') === 'edibleno'], [$this->request->get('PAGEN_1')]])) {
             $this->_checkModules();
 
             switch ($this->request->get('id'))
