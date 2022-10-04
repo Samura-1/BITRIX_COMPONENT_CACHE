@@ -2,9 +2,9 @@
 require($_SERVER["DOCUMENT_ROOT"]."/bitrix/header.php");
 $APPLICATION->SetTitle("Title");
 ?><?$APPLICATION->IncludeComponent(
-	"listitems",
-	"inner_items_template",
-	Array(
+	"listitems", 
+	"inner_items_template", 
+	array(
 		"CACHE_TIME" => "3600",
 		"CACHE_TYPE" => "A",
 		"COMPONENT_TEMPLATE" => "inner_items_template",
@@ -22,7 +22,9 @@ $APPLICATION->SetTitle("Title");
 		"PAGER_SHOW_ALWAYS" => "N",
 		"PAGER_TEMPLATE" => ".default",
 		"PAGER_TITLE" => "",
-		"SET_STATUS_404" => "N",
-		"SHOW_404" => "N"
-	)
+		"SET_STATUS_404" => "Y",
+		"SHOW_404" => "Y",
+		"FILE_404" => ""
+	),
+	false
 );?><br><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>

@@ -9,4 +9,8 @@ $APPLICATION->SetTitle("Рога и Сила");
 		</div>
 	</div>
 </div>
- </section> <section class="news-block-inverse px-6 py-4"> </section> <br><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
+ </section> <section class="news-block-inverse px-6 py-4"> </section> <?$APPLICATION->IncludeComponent(
+	"bitrix:news.list",
+	"",
+Array()
+);?><br><?require($_SERVER["DOCUMENT_ROOT"]."/bitrix/footer.php");?>
