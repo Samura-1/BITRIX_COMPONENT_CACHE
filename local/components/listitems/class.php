@@ -9,8 +9,8 @@ class Salons extends CBitrixComponent
 {
     protected $filter;
     protected $request;
-    protected $arNavigation;
-    protected $arNavParams;
+    private $arNavigation;
+    private $arNavParams;
     private function _checkModules()
     {
         if (!Loader::includeModule("iblock")) {
@@ -27,8 +27,13 @@ class Salons extends CBitrixComponent
         if (!isset($arParams["CACHE_TIME"])) {
             $arParams["CACHE_TIME"] = 3600;
         }
+        $this->arNavParams = [
+            "nPageSize" => $this->arParams["COUNT"],
+            "bShowAll" => false,
+        ];
         return $arParams;
     }
+
     private function getButtonAdd()
     {
         global $APPLICATION;
@@ -63,14 +68,6 @@ class Salons extends CBitrixComponent
         ];
         if (isset($this->filter)) {
             $arFilter[] = $this->filter;
-        }
-        $this->arNavParams = [
-            "nPageSize" => $this->arParams["COUNT"],
-            "bDescPageNumbering" => 'N',
-            "bShowAll" => false,
-        ];
-        if($this->arNavigation["PAGEN"] == 0 && $this->arParams["CACHE_TIME"] > 0) {
-            $this->arParams["CACHE_TIME"] = 36000;
         }
         $arResult["ITEMS"] = [];
         $arrayImgItem["PREVIEW_PICTURE_ID"] = [];
