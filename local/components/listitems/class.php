@@ -134,4 +134,3 @@ class Salons extends CBitrixComponent
         $this->getButtonAdd();
     }
 }
-
